@@ -138,9 +138,9 @@ module ActiveSupport
       end
 
       if @regexps.any? { |r| r.match?(key.to_s) }
-        value = @mask
+        value = apply_mask(value)
       elsif @deep_regexps&.any? { |r| r.match?(full_key) }
-        value = @mask
+        value = apply_mask(value)
       elsif value.is_a?(Hash)
         value = call(value, full_key, original_params)
       elsif value.is_a?(Array)
@@ -152,6 +152,12 @@ module ActiveSupport
       end
 
       value
+    end
+
+    def apply_mask(value)
+      return @mask.call(value) if @mask.respond_to?(:call)
+
+      @mask
     end
   end
 end

@@ -110,6 +110,13 @@ class ParameterFilterTest < ActiveSupport::TestCase
     assert_equal "non secret value", parameter_filter.filter_param("baz", "non secret value")
   end
 
+  test "filter_param should apply dynamic mask when mask is a callable object" do
+    test_value = "test"
+    hashed_value = test_value.hash
+    parameter_filter = ActiveSupport::ParameterFilter.new(["foo", /bar/], mask: ->(value) { value.hash })
+    assert_equal hashed_value, parameter_filter.filter_param("food", test_value)
+  end
+
   test "process parameter filter with hash having integer keys" do
     test_hashes = [
       [{ 13 => "bar" }, { 13 => "[FILTERED]" }, %w'13'],
